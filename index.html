@@ -456,7 +456,7 @@
 
 <script>
 /* ================= KONFIGURASI ================= */
-const API_URL = 'https://script.google.com/macros/s/AKfycbwPc7-Mqfj3r0RiXy_gYrjrfezFx_fYXpBRgMhIb5hSlYKi4YMdlJ7fQdksRsEdq9uy/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwOj59PxKlwfeDn8FcNEfqnq0hQg0jscBmIPzRm8awxhLa9GGYQQwk8NIgHxni9UF7o/exec';
 
 /* ================= STATE ================= */
 let currentUser = null;
@@ -532,23 +532,16 @@ async function pilihShift(shift){
   });
   const statusMsg = document.getElementById('statusMsg');
   const btnMulai = document.getElementById('btnMulai');
-  statusMsg.className = 'msg info'; statusMsg.textContent = 'Mengecek status pengerjaan...'; statusMsg.style.display='block';
-  btnMulai.disabled = true;
 
-  try{
-    const res = await fetch(`${API_URL}?action=cekStatus&nipp=${encodeURIComponent(currentUser.nipp)}&dinasan=${shift}`);
-    const data = await res.json();
-    if(data.ok && data.sudahMengerjakan){
-      statusMsg.className='msg error';
-      statusMsg.textContent = `Sudah mengerjakan dinasan ${shift} hari ini. Skor: ${data.skor} (${data.status}).`;
-      btnMulai.disabled = true;
-    } else {
-      statusMsg.className='msg info';
-      statusMsg.textContent = `Siap mengerjakan soal untuk dinasan ${shift}.`;
-      btnMulai.disabled = false;
-    }
-  } catch(err){
-    statusMsg.className='msg error'; statusMsg.textContent='Gagal mengecek status. Coba lagi.';
+  const sudah = currentUser.statusDinasan && currentUser.statusDinasan[String(shift)];
+  if(sudah){
+    statusMsg.className='msg error'; statusMsg.style.display='block';
+    statusMsg.textContent = `Sudah mengerjakan dinasan ${shift} hari ini. Skor: ${sudah.skor} (${sudah.status}).`;
+    btnMulai.disabled = true;
+  } else {
+    statusMsg.className='msg info'; statusMsg.style.display='block';
+    statusMsg.textContent = `Siap mengerjakan soal untuk dinasan ${shift}.`;
+    btnMulai.disabled = false;
   }
 }
 
