@@ -456,7 +456,7 @@
 
 <script>
 /* ================= KONFIGURASI ================= */
-const API_URL = 'https://script.google.com/macros/s/AKfycbyYvkdGjnWROPjyaZxhCPeUCXjutB6RoPo2Pcq048BALC1YlKx3-sKHyT00nz7Hv40/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxnLreOpozcXZxC-bimDqbhMSp_JrtrH0gzK4CVvHjXJBa0KYNRARWMP_11AHvmetVt/exec';
 
 /* ================= STATE ================= */
 let currentUser = null;
@@ -646,7 +646,10 @@ async function kirimJawaban(){
     kelompokSoal: currentUser.kelompokSoal,
     dinasanKe: currentShift,
     durasiDetik: durasiDetik,
-    jawaban: soalList.map(s => ({ id: s.id, jawabanUser: jawabanUser[s.id] }))
+    jawaban: soalList.map(s => ({
+      id: s.id,
+      jawabanTeks: jawabanUser[s.id] ? s.pilihan[jawabanUser[s.id]] : ''
+    }))
   };
 
   try{
