@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>PPKP - Pra Dinas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0F1720;
+    --panel:#16212C;
+    --panel-2:#1D2C39;
+    --line:#2A3A48;
+    --amber:#F2A93B;
+    --amber-dim:#8A6624;
+    --green:#3DDC97;
+    --green-dim:#1F6B4C;
+    --red:#E5484D;
+    --red-dim:#7A2528;
+    --text:#E8EDF2;
+    --text-muted:#8B99A8;
+    --font-display:'Oswald',sans-serif;
+    --font-body:'Inter',sans-serif;
+    --font-mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:32px 16px;
+  }
+  .app{
+    width:100%;
+    max-width:480px;
+  }
+  .brand{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:24px;
+    padding-bottom:16px;
+    border-bottom:1px solid var(--line);
+  }
+  .brand h1{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:22px;
+    letter-spacing:0.5px;
+  }
+  .brand span{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--text-muted);
+    text-transform:uppercase;
+    letter-spacing:1px;
+  }
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:24px;
+    margin-bottom:16px;
+  }
+  .shift-board{
+    display:flex;
+    gap:8px;
+    margin-bottom:24px;
+  }
+  .shift-block{
+    flex:1;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:10px 8px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .shift-block:hover{border-color:var(--amber-dim);}
+  .shift-block.active{
+    background:rgba(242,169,59,0.12);
+    border-color:var(--amber);
+  }
+  .shift-block .num{
+    font-family:var(--font-mono);
+    font-size:20px;
+    font-weight:500;
+    color:var(--text-muted);
+  }
+  .shift-block.active .num{color:var(--amber);}
+  .shift-block .jam{
+    font-family:var(--font-mono);
+    font-size:10px;
+    color:var(--text-muted);
+    margin-top:2px;
+    display:block;
+  }
+  label{
+    display:block;
+    font-size:12px;
+    color:var(--text-muted);
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    margin-bottom:6px;
+    margin-top:16px;
+  }
+  label:first-child{margin-top:0;}
+  input[type=text]{
+    width:100%;
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:12px 14px;
+    color:var(--text);
+    font-family:var(--font-mono);
+    font-size:15px;
+    outline:none;
+  }
+  input[type=text]:focus{border-color:var(--amber);}
+  .readonly-field{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:12px 14px;
+    font-size:14px;
+    color:var(--text);
+  }
+  .readonly-field .rf-label{
+    font-size:10px;
+    color:var(--text-muted);
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    display:block;
+    margin-bottom:2px;
+  }
+  .identitas-preview{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:16px;
+  }
+  button{
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:14px;
+    border:none;
+    border-radius:4px;
+    padding:14px;
+    cursor:pointer;
+    width:100%;
+    margin-top:20px;
+    transition:opacity .15s;
+  }
+  button:disabled{opacity:0.4;cursor:not-allowed;}
+  button:not(:disabled):hover{opacity:0.9;}
+  .btn-primary{background:var(--amber);color:#221703;}
+  .btn-secondary{background:transparent;border:1px solid var(--line);color:var(--text);}
+  .msg{
+    font-size:13px;
+    padding:10px 12px;
+    border-radius:4px;
+    margin-top:12px;
+    display:none;
+  }
+  .msg.error{display:block;background:rgba(229,72,77,0.12);color:#F5A2A5;border:1px solid var(--red-dim);}
+  .msg.info{display:block;background:rgba(242,169,59,0.1);color:var(--amber);border:1px solid var(--amber-dim);}
+  .progress-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+  }
+  .progress-row .count{
+    font-family:var(--font-mono);
+    font-size:13px;
+    color:var(--text-muted);
+  }
+  .progress-bar{
+    height:4px;
+    background:var(--line);
+    border-radius:2px;
+    overflow:hidden;
+    margin-bottom:24px;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--amber);
+    transition:width .2s;
+  }
+  .soal-text{
+    font-size:16px;
+    line-height:1.6;
+    margin-bottom:20px;
+  }
+  .opsi{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:13px 14px;
+    margin-bottom:10px;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .opsi:hover{border-color:var(--amber-dim);}
+  .opsi.selected{border-color:var(--amber);background:rgba(242,169,59,0.08);}
+  .opsi .huruf{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--text-muted);
+    width:20px;
+    height:20px;
+    border:1px solid var(--line);
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+  .opsi.selected .huruf{border-color:var(--amber);color:var(--amber);}
+  .opsi .teks{font-size:14px;}
+  .nav-row{display:flex;gap:10px;}
+  .nav-row button{margin-top:0;}
+  .hasil-skor{
+    text-align:center;
+    padding:20px 0;
+  }
+  .hasil-skor .angka{
+    font-family:var(--font-mono);
+    font-size:56px;
+    font-weight:500;
+    line-height:1;
+  }
+  .hasil-skor .angka.lulus{color:var(--green);}
+  .hasil-skor .angka.tidak{color:var(--red);}
+  .hasil-skor .status-label{
+    font-family:var(--font-display);
+    font-size:14px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    margin-top:8px;
+  }
+  .hasil-skor .status-label.lulus{color:var(--green);}
+  .hasil-skor .status-label.tidak{color:var(--red);}
+  .hasil-detail{
+    display:flex;
+    justify-content:center;
+    gap:24px;
+    margin-top:20px;
+    font-family:var(--font-mono);
+    font-size:13px;
+    color:var(--text-muted);
+  }
+  .hidden{display:none !important;}
+  .spinner{
+    display:inline-block;
+    width:14px;height:14px;
+    border:2px solid rgba(255,255,255,0.25);
+    border-top-color:#221703;
+    border-radius:50%;
+    animation:spin .6s linear infinite;
+    vertical-align:middle;
+    margin-right:6px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="brand">
+    <h1>PPKP</h1>
+    <span id="tanggalHeader">--</span>
+  </div>
+
+  <!-- ============ SCREEN: LOGIN ============ -->
+  <div id="screenLogin" class="card">
+    <label>NIPP</label>
+    <input type="text" id="inputNipp" placeholder="Masukkan NIPP" inputmode="numeric" autocomplete="off">
+    <div id="loginMsg" class="msg"></div>
+    <button class="btn-primary" id="btnCekNipp" onclick="cekNipp()">Cek identitas</button>
+
+    <div id="identitasBox" class="hidden">
+      <div class="identitas-preview">
+        <div class="readonly-field"><span class="rf-label">Nama</span><span id="pNama">-</span></div>
+        <div class="readonly-field"><span class="rf-label">Jabatan</span><span id="pJabatan">-</span></div>
+        <div class="readonly-field" style="grid-column:span 2"><span class="rf-label">Penempatan</span><span id="pPenempatan">-</span></div>
+        <div class="readonly-field" style="grid-column:span 2"><span class="rf-label">Paket soal</span><span id="pKelompok">-</span></div>
+      </div>
+
+      <label>Pilih dinasan</label>
+      <div class="shift-board" id="shiftBoard">
+        <div class="shift-block" data-shift="1" onclick="pilihShift(1)"><div class="num">1</div><span class="jam">00-08</span></div>
+        <div class="shift-block" data-shift="2" onclick="pilihShift(2)"><div class="num">2</div><span class="jam">08-16</span></div>
+        <div class="shift-block" data-shift="3" onclick="pilihShift(3)"><div class="num">3</div><span class="jam">16-24</span></div>
+      </div>
+
+      <div id="statusMsg" class="msg"></div>
+      <button class="btn-primary" id="btnMulai" onclick="mulaiUjian()" disabled>Mulai pengerjaan</button>
+    </div>
+  </div>
+
+  <!-- ============ SCREEN: QUIZ ============ -->
+  <div id="screenQuiz" class="card hidden">
+    <div class="progress-row">
+      <span class="count" id="soalCounter">Soal 1/10</span>
+      <span class="count" id="dinasanBadge">Dinasan 1</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="soal-text" id="soalText">-</div>
+    <div id="opsiContainer"></div>
+    <div class="nav-row">
+      <button class="btn-secondary" id="btnSebelumnya" onclick="soalSebelumnya()">Sebelumnya</button>
+      <button class="btn-primary" id="btnSelanjutnya" onclick="soalSelanjutnya()">Selanjutnya</button>
+    </div>
+  </div>
+
+  <!-- ============ SCREEN: HASIL ============ -->
+  <div id="screenHasil" class="card hidden">
+    <div class="hasil-skor">
+      <div class="angka" id="hasilAngka">0</div>
+      <div class="status-label" id="hasilStatus">-</div>
+      <div class="hasil-detail">
+        <span id="hasilBenar">0 benar</span>
+        <span id="hasilTotal">0 soal</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= KONFIGURASI ================= */
+// Ganti dengan URL Web App hasil deploy Google Apps Script kamu
+const API_URL = 'https://script.google.com/macros/s/AKfycbztPZE5tZr-FW8f_9hUOwSNpQkov1kD1ZcKNKCvMK50RM8om__20BBdxLmBb97x-OQQ/exec';
+
+/* ================= STATE ================= */
+let currentUser = null;
+let currentShift = null;
+let soalList = [];
+let jawabanUser = {};
+let indexSoal = 0;
+let waktuMulai = null;
+
+document.getElementById('tanggalHeader').textContent =
+  new Date().toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' });
+
+function labelKelompok(kel){
+  if(kel === 'PPKP_DALOPKA') return 'PPKP & DALOPKA';
+  if(kel === 'DALSAR') return 'DALSAR';
+  return kel || '-';
+}
+
+/* ================= LOGIN ================= */
+async function cekNipp(){
+  const nipp = document.getElementById('inputNipp').value.trim();
+  const msg = document.getElementById('loginMsg');
+  msg.className = 'msg'; msg.textContent = '';
+  if(!nipp){ msg.className='msg error'; msg.textContent='Isi NIPP terlebih dahulu.'; msg.style.display='block'; return; }
+
+  const btn = document.getElementById('btnCekNipp');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Memeriksa...';
+
+  try{
+    const res = await fetch(`${API_URL}?action=login&nipp=${encodeURIComponent(nipp)}`);
+    const data = await res.json();
+    if(data.ok){
+      currentUser = data;
+      document.getElementById('pNama').textContent = data.nama;
+      document.getElementById('pJabatan').textContent = data.jabatan;
+      document.getElementById('pPenempatan').textContent = data.penempatan;
+      document.getElementById('pKelompok').textContent = labelKelompok(data.kelompokSoal);
+      document.getElementById('identitasBox').classList.remove('hidden');
+    } else {
+      msg.className='msg error'; msg.textContent = data.error || 'NIPP tidak ditemukan.';
+    }
+  } catch(err){
+    msg.className='msg error'; msg.textContent = 'Gagal menghubungi server. Cek koneksi atau URL API.';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Cek identitas';
+  }
+}
+
+async function pilihShift(shift){
+  currentShift = shift;
+  document.querySelectorAll('.shift-block').forEach(el=>{
+    el.classList.toggle('active', Number(el.dataset.shift) === shift);
+  });
+  const statusMsg = document.getElementById('statusMsg');
+  const btnMulai = document.getElementById('btnMulai');
+  statusMsg.className = 'msg info'; statusMsg.textContent = 'Mengecek status pengerjaan...'; statusMsg.style.display='block';
+  btnMulai.disabled = true;
+
+  try{
+    const res = await fetch(`${API_URL}?action=cekStatus&nipp=${encodeURIComponent(currentUser.nipp)}&dinasan=${shift}`);
+    const data = await res.json();
+    if(data.ok && data.sudahMengerjakan){
+      statusMsg.className='msg error';
+      statusMsg.textContent = `Sudah mengerjakan dinasan ${shift} hari ini. Skor: ${data.skor} (${data.status}).`;
+      btnMulai.disabled = true;
+    } else {
+      statusMsg.className='msg info';
+      statusMsg.textContent = `Siap mengerjakan soal untuk dinasan ${shift}.`;
+      btnMulai.disabled = false;
+    }
+  } catch(err){
+    statusMsg.className='msg error'; statusMsg.textContent='Gagal mengecek status. Coba lagi.';
+  }
+}
+
+/* ================= QUIZ ================= */
+async function mulaiUjian(){
+  const btn = document.getElementById('btnMulai');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Menyiapkan soal...';
+  try{
+    const res = await fetch(`${API_URL}?action=soal&kelompok=${encodeURIComponent(currentUser.kelompokSoal)}`);
+    const data = await res.json();
+    if(!data.ok || !data.soal.length){
+      alert('Belum ada soal aktif. Hubungi admin.');
+      btn.disabled = false; btn.textContent = 'Mulai pengerjaan';
+      return;
+    }
+    soalList = data.soal;
+    jawabanUser = {};
+    indexSoal = 0;
+    waktuMulai = Date.now();
+
+    document.getElementById('screenLogin').classList.add('hidden');
+    document.getElementById('screenQuiz').classList.remove('hidden');
+    document.getElementById('dinasanBadge').textContent = `Dinasan ${currentShift}`;
+    renderSoal();
+  } catch(err){
+    alert('Gagal memuat soal.');
+    btn.disabled = false; btn.textContent = 'Mulai pengerjaan';
+  }
+}
+
+function renderSoal(){
+  const soal = soalList[indexSoal];
+  document.getElementById('soalCounter').textContent = `Soal ${indexSoal+1}/${soalList.length}`;
+  document.getElementById('progressFill').style.width = `${((indexSoal+1)/soalList.length)*100}%`;
+  document.getElementById('soalText').textContent = soal.pertanyaan;
+
+  const container = document.getElementById('opsiContainer');
+  container.innerHTML = '';
+  Object.keys(soal.pilihan).forEach(huruf=>{
+    const div = document.createElement('div');
+    div.className = 'opsi' + (jawabanUser[soal.id] === huruf ? ' selected' : '');
+    div.onclick = () => pilihJawaban(soal.id, huruf);
+    div.innerHTML = `<span class="huruf">${huruf}</span><span class="teks">${soal.pilihan[huruf]}</span>`;
+    container.appendChild(div);
+  });
+
+  document.getElementById('btnSebelumnya').style.visibility = indexSoal === 0 ? 'hidden' : 'visible';
+  document.getElementById('btnSelanjutnya').textContent = indexSoal === soalList.length - 1 ? 'Selesai & kirim' : 'Selanjutnya';
+}
+
+function pilihJawaban(idSoal, huruf){
+  jawabanUser[idSoal] = huruf;
+  renderSoal();
+}
+
+function soalSebelumnya(){
+  if(indexSoal > 0){ indexSoal--; renderSoal(); }
+}
+
+function soalSelanjutnya(){
+  const soal = soalList[indexSoal];
+  if(!jawabanUser[soal.id]){ alert('Pilih salah satu jawaban dulu.'); return; }
+  if(indexSoal < soalList.length - 1){ indexSoal++; renderSoal(); }
+  else { kirimJawaban(); }
+}
+
+async function kirimJawaban(){
+  const btn = document.getElementById('btnSelanjutnya');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Mengirim...';
+
+  const durasiDetik = Math.round((Date.now() - waktuMulai) / 1000);
+  const payload = {
+    action: 'submit',
+    nipp: currentUser.nipp,
+    nama: currentUser.nama,
+    jabatan: currentUser.jabatan,
+    penempatan: currentUser.penempatan,
+    kelompokSoal: currentUser.kelompokSoal,
+    dinasanKe: currentShift,
+    durasiDetik: durasiDetik,
+    jawaban: soalList.map(s => ({ id: s.id, jawabanUser: jawabanUser[s.id] }))
+  };
+
+  try{
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    tampilkanHasil(data);
+  } catch(err){
+    alert('Gagal mengirim jawaban. Cek koneksi lalu coba lagi.');
+    btn.disabled = false; btn.textContent = 'Selesai & kirim';
+  }
+}
+
+function tampilkanHasil(data){
+  document.getElementById('screenQuiz').classList.add('hidden');
+  document.getElementById('screenHasil').classList.remove('hidden');
+
+  const lulus = data.status === 'Lulus';
+  const angka = document.getElementById('hasilAngka');
+  angka.textContent = data.skor;
+  angka.className = 'angka ' + (lulus ? 'lulus' : 'tidak');
+
+  const status = document.getElementById('hasilStatus');
+  status.textContent = data.status;
+  status.className = 'status-label ' + (lulus ? 'lulus' : 'tidak');
+
+  document.getElementById('hasilBenar').textContent = `${data.benar} benar`;
+  document.getElementById('hasilTotal').textContent = `dari ${data.total} soal`;
+}
+</script>
+</body>
+</html>
