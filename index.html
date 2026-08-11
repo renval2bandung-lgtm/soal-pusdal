@@ -456,7 +456,7 @@
 
 <script>
 /* ================= KONFIGURASI ================= */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxzr1hEjerdFDpikKuURVs06h-68E9uhvWQlF6ZaF148TA-cJiIO60LBnzblhWBkznA/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyYvkdGjnWROPjyaZxhCPeUCXjutB6RoPo2Pcq048BALC1YlKx3-sKHyT00nz7Hv40/exec';
 
 /* ================= STATE ================= */
 let currentUser = null;
@@ -468,6 +468,10 @@ let waktuMulai = null;
 
 document.getElementById('tanggalHeader').textContent =
   new Date().toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' });
+
+// "Pemanasan" diam-diam begitu halaman dibuka, supaya saat user benar-benar
+// login server Apps Script sudah tidak dalam kondisi cold-start lagi.
+fetch(`${API_URL}?action=ping`).catch(()=>{});
 
 const SEMANGAT_QUOTES = [
   'Tarik napas sebentar. Kamu sudah siap untuk dinasan ini.',
